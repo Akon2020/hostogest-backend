@@ -4,7 +4,7 @@ import cors from "cors";
 import logger from "morgan";
 import cookieParser from "cookie-parser";
 import { PORT, URL_ORIGIN } from "./config/env.js";
-import errorMiddleware, { errorLogs } from "./middleware/error.middleware.js";
+import errorMiddleware, { errorLogs } from "./middlewares/error.middleware.js";
 
 const app = express();
 

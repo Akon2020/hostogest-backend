@@ -2,14 +2,14 @@ import db from "../database/db.js";
 import bcrypt from "bcryptjs";
 
 export default class UserModel {
-  static async findByEmail(email) {
+  static async findUsersByEmail(email) {
     const [rows] = await db.query("SELECT * FROM utilisateur WHERE email = ?", [
       email,
     ]);
     return rows[0] || null;
   }
 
-  static async findById(id) {
+  static async findUserById(id) {
     const [rows] = await db.query(
       "SELECT * FROM utilisateur WHERE id_utilisateur = ?",
       [id]
@@ -17,7 +17,7 @@ export default class UserModel {
     return rows[0] || null;
   }
 
-  static async findAll() {
+  static async findAllUsers() {
     const [rows] = await db.query("SELECT * FROM utilisateur");
     return rows;
   }

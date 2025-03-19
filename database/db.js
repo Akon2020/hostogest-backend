@@ -1,4 +1,4 @@
-import mysql from "mysql2";
+import mysql from 'mysql2/promise';
 import { DB_HOST, DB_NAME, DB_PASS, DB_USER, NODE_ENV } from "../config/env.js";
 
 if (!DB_HOST) {
@@ -14,13 +14,14 @@ const db = mysql.createPool({
   database: DB_NAME,
 });
 
-db.getConnection((err, connection) => {
-  if (err) {
-    console.log(`Erreur de connexion à la base de données: ${err.message}`);
-  } else {
+db.getConnection()
+  .then(connection => {
     console.log(`Base de données connectée avec succès en mode ${NODE_ENV}`);
     connection.release();
-  }
-});
+  })
+  .catch(err => {
+    console.log(`Erreur de connexion à la base de données: ${err.message}`);
+  });
+
 
 export default db;

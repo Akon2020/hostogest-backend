@@ -22,8 +22,9 @@ export default class UserModel {
     return rows;
   }
 
-  static async createUser({ nom, prenom, email, mot_de_passe }) {
-    const hashedPassword = await bcrypt.hash(mot_de_passe, 10);
+  static async createUser({ nom, prenom, email, password }) {
+    const salt = await bcrypt.genSalt()
+    const hashedPassword = await bcrypt.hash(password, salt);
     const [result] = await db.query(
       "INSERT INTO utilisateur (nom, prenom, email, mot_de_passe) VALUES (?, ?, ?, ?)",
       [nom, prenom, email, hashedPassword]

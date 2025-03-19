@@ -1,7 +1,7 @@
-import UserModel from "../models/user.model";
+import UserModel from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import { EMAIL, HOST_URL, JWT_SECRET } from "../config/env";
+import { EMAIL, HOST_URL, JWT_SECRET } from "../config/env.js";
 import transporter from "../config/nodemailer.js";
 import { resetPasswordEmailTemplate } from "../utils/email.template.js";
 
@@ -12,24 +12,29 @@ const generateToken = (user) => {
 };
 
 export const register = async (req, res) => {
-  const { nom, prenom, email, password } = req.body;
-  const userExists = await UserModel.findUserByEmail(email);
-  if (userExists) {
-    return res
-      .status(400)
-      .json({ message: "Cet utilisateur a déjà un compte" });
+  try {
+    const { nom, prenom, email, password } = req.body;
+    const userExists = await UserModel.findUserByEmail(email);
+    if (userExists) {
+      return res
+        .status(400)
+        .json({ message: "Cet utilisateur a déjà un compte" });
+    }
+    const userId = await UserModel.createUser({ nom, prenom, email, password });
+    const token = generateToken({ id: userId, email });
+
+    res.cookie("token", token, { httpOnly: true, secure: true });
+    res.status(201).json({ message: "Utilisateur créé avec succès", token });
+  } catch (error) {
+    console.error("Erreur lors de l'inscription :", error);
+    res.status(500).json({ message: "Erreur serveur" });
   }
-  const userId = await UserModel.createUser({ nom, prenom, email, password });
-  res.cookie("token", generateToken({ id: userId, email }));
-  //   res.redirect("/dashboard");
 };
 
 export const login = async (req, res) => {
   const { email, password } = req.body;
   const user = await UserModel.findUserByEmail(email);
-  console.log("User.mot_de_passe: ", user.mot_de_passe);
-  console.log("User.password: ", user.password);
-  if (!user || !(await bcrypt.compare(password, user.password))) {
+  if (!user || !(await bcrypt.compare(password, user.mot_de_passe))) {
     return res.status(400).json({ message: "Email ou mot de passe incorrect" });
   }
   res.cookie("token", generateToken(user));
@@ -38,7 +43,7 @@ export const login = async (req, res) => {
 
 export const resetPassword = async (req, res) => {
   const { email } = req.body;
-  const user = UserModel.findUserByEmail(email);
+  const user = await UserModel.findUserByEmail(email);
 
   if (!user) {
     return res.status(400).json({ message: "Email introuvable" });

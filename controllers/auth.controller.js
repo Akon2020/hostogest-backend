@@ -20,5 +20,19 @@ export const register = async (req, res) => {
   }
   const userId = await UserModel.createUser({ nom, prenom, email, password });
   res.cookie("token", generateToken({ id: userId, email }));
+  //   res.redirect("/dashboard");
+};
+
+export const login = async (req, res) => {
+  const { email, password } = req.body;
+  const user = await UserModel.findUsersByEmail(email);
+  console.log("User.mot_de_passe: ", user.mot_de_passe);
+  console.log("User.password: ", user.password);
+  if (!user || !(await bcrypt.compare(password, user.password))) {
+    return res
+      .status(400)
+      .json({ message: "Email ou mot de passe incorrect." });
+  }
+  res.cookie("token", generateToken(user));
 //   res.redirect("/dashboard");
 };

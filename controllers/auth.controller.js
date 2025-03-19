@@ -64,10 +64,13 @@ export const resetPassword = async (req, res) => {
       from: EMAIL,
       to: email,
       subject: "Réinitialisation du mot de passe",
-      html: resetPasswordEmailTemplate(user.prenom, email, HOST_URL, resetToken),
+      html: resetPasswordEmailTemplate(
+        user.prenom,
+        email,
+        HOST_URL,
+        resetToken
+      ),
     };
-    
-    console.log(`${HOST_URL}/reset-password/${resetToken}`);
 
     await transporter.sendMail(mailOptions);
     res.status(201).json({
@@ -76,6 +79,46 @@ export const resetPassword = async (req, res) => {
     });
   } catch (error) {
     console.error("Erreur lors de l'envoi de l'email :", error);
-    res.status(500).json({ message: "Erreur lors de l'envoi de l'email de réinitialisation! Réessayez plus tard", resetLink: `${HOST_URL}/reset-password/${resetToken}`});
+    res
+      .status(500)
+      .json({
+        message:
+          "Erreur lors de l'envoi de l'email de réinitialisation! Réessayez plus tard",
+      });
+  }
+};
+
+export const updatePassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { newPassword } = req.body;
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decoded) {
+      return res.status(400).json({ message: "Token invalide ou expiré" });
+    }
+
+    const user = await UserModel.findById(decoded.id);
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({ message: "Mot de passe réinitialisé avec succès" });
+  } catch (error) {
+    console.error(
+      "Erreur lors de la réinitialisation du mot de passe :",
+      error
+    );
+    res
+      .status(500)
+      .json({
+        message: "Erreur lors de la réinitialisation du mot de passe :",
+        error,
+      });
   }
 };

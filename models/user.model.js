@@ -2,7 +2,7 @@ import db from "../database/db.js";
 import bcrypt from "bcryptjs";
 
 export default class UserModel {
-  static async findUsersByEmail(email) {
+  static async findUserByEmail(email) {
     const [rows] = await db.query("SELECT * FROM utilisateur WHERE email = ?", [
       email,
     ]);

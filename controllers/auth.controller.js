@@ -7,7 +7,7 @@ import { resetPasswordEmailTemplate } from "../utils/email.template.js";
 
 const generateToken = (user) => {
   return jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
-    expiresIn: "24h",
+    expiresIn: "1d",
   });
 };
 
@@ -79,28 +79,29 @@ export const resetPassword = async (req, res) => {
     });
   } catch (error) {
     console.error("Erreur lors de l'envoi de l'email :", error);
-    res
-      .status(500)
-      .json({
-        message:
-          "Erreur lors de l'envoi de l'email de réinitialisation! Réessayez plus tard",
-      });
+    res.status(500).json({
+      message:
+        "Erreur lors de l'envoi de l'email de réinitialisation! Réessayez plus tard",
+    });
   }
 };
 
 export const updatePassword = async (req, res) => {
   try {
-    const { token } = req.params;
+    const { token } = req.query;
     const { newPassword } = req.body;
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
     if (!decoded) {
       return res.status(400).json({ message: "Token invalide ou expiré" });
     }
 
-    const user = await UserModel.findById(decoded.id);
+    const user2 = await UserModel.findById(decoded.id);
+    const user = await UserModel.findOne({ email: decoded.email });
+    console.log(user.email)
+    console.log(`User: ${user} | User2: ${user2}`);
     if (!user) {
-      return res.status(404).json({ message: "Utilisateur non trouvé" });
+      return res.status(404).json({ message: "Utilisateur non trouvé", user });
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -114,11 +115,9 @@ export const updatePassword = async (req, res) => {
       "Erreur lors de la réinitialisation du mot de passe :",
       error
     );
-    res
-      .status(500)
-      .json({
-        message: "Erreur lors de la réinitialisation du mot de passe :",
-        error,
-      });
+    res.status(500).json({
+      message: "Erreur lors de la réinitialisation du mot de passe :",
+      error,
+    });
   }
 };

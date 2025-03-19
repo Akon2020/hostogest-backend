@@ -15,25 +15,27 @@ const logger = winston.createLogger({
 });
 
 const handleDatabaseError = (err, res) => {
+  if (!res || typeof res.status !== "function") return;
+
   switch (err.code) {
     case "ER_ACCESS_DENIED_ERROR":
       return res
         .status(500)
-        .json({ message: "Accès refusé à la base de donnée" });
+        .json({ message: "Accès refusé à la base de données" });
     case "ER_BAD_DB_ERROR":
-      return res.status(500).json({ message: "Base de donnée introuvable" });
+      return res.status(500).json({ message: "Base de données introuvable" });
     case "ER_PARSE_ERROR":
       return res
         .status(400)
-        .json({ message: "La synthaxe de la requête est invalide" });
+        .json({ message: "La syntaxe de la requête est invalide" });
     case "ER_DUP_ENTRY":
       return res.status(409).json({ message: "Entrée dupliquée" });
     default:
-      return res.status(500).json({ message: "Erreur de la base de donnée" });
+      return res.status(500).json({ message: "Erreur de la base de données" });
   }
 };
 
-const errorMiddleware = (err, req, res) => {
+const errorMiddleware = (err, req, res, next) => {
   logger.error({
     time: `${new Date().toDateString()} | ${new Date().toLocaleTimeString()}`,
     message: err.message,
@@ -41,6 +43,11 @@ const errorMiddleware = (err, req, res) => {
     route: req.originalUrl,
     method: req.method,
   });
+
+  if (!res || typeof res.status !== "function") {
+    console.error("Erreur critique : la réponse Express est invalide.");
+    return next(err);
+  }
 
   if (err.sql) {
     return handleDatabaseError(err, res);
@@ -70,10 +77,10 @@ export const errorLogs = (req, res) => {
         return res.status(500).json({ message: "Impossible de lire les logs" });
       }
       res.setHeader("Content-Type", "text/plain");
-      res.send(data);
+      return res.send(data);
     });
   } else {
-    res.status(403).json({ message: "Accès interdit" });
+    return res.status(403).json({ message: "Accès interdit" });
   }
 };
 

@@ -32,39 +32,50 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const { email, password } = req.body;
-  const user = await UserModel.findUserByEmail(email);
-  if (!user || !(await bcrypt.compare(password, user.mot_de_passe))) {
-    return res.status(400).json({ message: "Email ou mot de passe incorrect" });
+  try {
+    const { email, password } = req.body;
+    const user = await UserModel.findUserByEmail(email);
+    if (!user || !(await bcrypt.compare(password, user.mot_de_passe))) {
+      return res
+        .status(400)
+        .json({ message: "Email ou mot de passe incorrect" });
+    }
+    res.cookie("token", generateToken(user));
+    res.status(201).json({
+      message: "Utilisateur connecté avec succès",
+      token: generateToken(user),
+    });
+  } catch (error) {
+    console.error("Erreur lors de la connexion :", error);
+    res.status(500).json({ message: "Erreur serveur" });
   }
-  res.cookie("token", generateToken(user));
-  //   res.redirect("/dashboard");
 };
 
 export const resetPassword = async (req, res) => {
-  const { email } = req.body;
-  const user = await UserModel.findUserByEmail(email);
+  try {
+    const { email } = req.body;
+    const user = await UserModel.findUserByEmail(email);
 
-  if (!user) {
-    return res.status(400).json({ message: "Email introuvable" });
-  }
-  const resetToken = generateToken(user);
-  const mailOptions = {
-    from: EMAIL,
-    to: email,
-    subject: "Réinitialisation du mot de passe",
-    html: resetPasswordEmailTemplate(user.nom, email, HOST_URL, resetToken),
-  };
-  await transporter.sendMail(mailOptions, (err) => {
-    if (err) {
-      return res.status(500).json({
-        message:
-          "Erreur lors de l'envoi de l'email de réinitialisation! Veuillez réessayer",
-      });
+    if (!user) {
+      return res.status(400).json({ message: "Email introuvable" });
     }
+    const resetToken = generateToken(user);
+    const mailOptions = {
+      from: EMAIL,
+      to: email,
+      subject: "Réinitialisation du mot de passe",
+      html: resetPasswordEmailTemplate(user.prenom, email, HOST_URL, resetToken),
+    };
+    
+    console.log(`${HOST_URL}/reset-password/${resetToken}`);
+
+    await transporter.sendMail(mailOptions);
     res.status(201).json({
       message:
-        "Un email contenant les procédures de réinitialisation vous a été envoyé! Consulter votre boîte mail.",
+        "Un email de réinitialisation vous a été envoyé! Consultez votre boîte mail",
     });
-  });
+  } catch (error) {
+    console.error("Erreur lors de l'envoi de l'email :", error);
+    res.status(500).json({ message: "Erreur lors de l'envoi de l'email de réinitialisation! Réessayez plus tard", resetLink: `${HOST_URL}/reset-password/${resetToken}`});
+  }
 };

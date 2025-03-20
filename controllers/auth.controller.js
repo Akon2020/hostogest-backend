@@ -1,17 +1,17 @@
 import UserModel from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import { EMAIL, HOST_URL, JWT_SECRET } from "../config/env.js";
+import { EMAIL, HOST_URL, JWT_EXPIRES_IN, JWT_SECRET } from "../config/env.js";
 import transporter from "../config/nodemailer.js";
 import { resetPasswordEmailTemplate } from "../utils/email.template.js";
 
 const generateToken = (user) => {
-  return jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
-    expiresIn: "1d",
+  return jwt.sign({ email: user.email }, JWT_SECRET, {
+    expiresIn: JWT_EXPIRES_IN,
   });
 };
 
-export const register = async (req, res) => {
+export const register = async (req, res, next) => {
   try {
     const { nom, prenom, email, password } = req.body;
     const userExists = await UserModel.findUserByEmail(email);
@@ -24,40 +24,51 @@ export const register = async (req, res) => {
     const token = generateToken({ id: userId, email });
 
     res.cookie("token", token, { httpOnly: true, secure: true });
-    res.status(201).json({ message: "Utilisateur créé avec succès", token });
+    res.status(201).json({
+      message: "Utilisateur créé avec succès",
+      data: { token, user: userId },
+    });
   } catch (error) {
     console.error("Erreur lors de l'inscription :", error);
     res.status(500).json({ message: "Erreur serveur" });
+    next(error);
   }
 };
 
-export const login = async (req, res) => {
+export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const user = await UserModel.findUserByEmail(email);
     if (!user || !(await bcrypt.compare(password, user.mot_de_passe))) {
       return res
-        .status(400)
+        .status(409)
         .json({ message: "Email ou mot de passe incorrect" });
     }
-    res.cookie("token", generateToken(user));
+    const loginToken = generateToken(user);
+    res.cookie("token", loginToken);
     res.status(201).json({
-      message: "Utilisateur connecté avec succès",
-      token: generateToken(user),
+      message: `Bienvenu ${user.prenom} 👋`,
+      data: { token: loginToken, userInfo: user },
     });
   } catch (error) {
     console.error("Erreur lors de la connexion :", error);
     res.status(500).json({ message: "Erreur serveur" });
+    next(error);
   }
 };
 
-export const resetPassword = async (req, res) => {
+export const resetPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
     const user = await UserModel.findUserByEmail(email);
 
     if (!user) {
-      return res.status(400).json({ message: "Email introuvable" });
+      return res
+        .status(400)
+        .json({
+          message:
+            "Cet email n'est attaché à aucun compte! Veuillez vérifier votre email",
+        });
     }
     const resetToken = generateToken(user);
     const mailOptions = {
@@ -76,48 +87,51 @@ export const resetPassword = async (req, res) => {
     res.status(201).json({
       message:
         "Un email de réinitialisation vous a été envoyé! Consultez votre boîte mail",
+      dev: {
+        resetUrl: `${HOST_URL}/auth/resetpassword?token=${resetToken}`,
+      },
     });
   } catch (error) {
-    console.error("Erreur lors de l'envoi de l'email :", error);
     res.status(500).json({
       message:
         "Erreur lors de l'envoi de l'email de réinitialisation! Réessayez plus tard",
     });
+    next(error);
   }
 };
 
-export const updatePassword = async (req, res) => {
+export const updatePassword = async (req, res, next) => {
   try {
     const { token } = req.query;
     const { newPassword } = req.body;
 
+    if (!token || !newPassword) {
+      return res
+        .status(400)
+        .json({ message: "Token et nouveau mot de passe requis" });
+    }
+
     const decoded = jwt.verify(token, JWT_SECRET);
-    if (!decoded) {
+    if (!decoded || !decoded.email) {
       return res.status(400).json({ message: "Token invalide ou expiré" });
     }
 
-    const user2 = await UserModel.findById(decoded.id);
-    const user = await UserModel.findOne({ email: decoded.email });
-    console.log(user.email)
-    console.log(`User: ${user} | User2: ${user2}`);
+    const user = await UserModel.findUserByEmail(decoded.email);
     if (!user) {
-      return res.status(404).json({ message: "Utilisateur non trouvé", user });
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
     }
 
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await UserModel.updatePassword(user.id_utilisateur, newPassword);
 
-    user.password = hashedPassword;
-    await user.save();
-
-    res.status(200).json({ message: "Mot de passe réinitialisé avec succès" });
+    res.status(200).json({ message: "Mot de passe réinitialisé avec succès! Connectez-vous maintenant" });
   } catch (error) {
     console.error(
       "Erreur lors de la réinitialisation du mot de passe :",
       error
     );
-    res.status(500).json({
-      message: "Erreur lors de la réinitialisation du mot de passe :",
-      error,
-    });
+    res
+      .status(500)
+      .json({ message: "Erreur lors de la réinitialisation du mot de passe" });
+    next(error);
   }
 };

@@ -11,6 +11,7 @@ export const {
   DB_PASS,
   DB_NAME,
   JWT_SECRET,
+  JWT_EXPIRES_IN,
   EMAIL,
   EMAIL_PASSWORD,
   HOST_URL,

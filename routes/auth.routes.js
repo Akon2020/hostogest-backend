@@ -11,6 +11,6 @@ const authRouter = Router();
 authRouter.post("/register", register);
 authRouter.post("/login", login);
 authRouter.post("/reset-password", resetPassword);
-authRouter.post("/reset/:token", updatePassword);
+authRouter.post("/resetpassword", updatePassword);
 
 export default authRouter;

@@ -16,15 +16,6 @@ export default class UserModel {
     );
     return rows.length > 0 ? rows[0] : null;
 }
-
-  /* static async findUserById(id) {
-    const [rows] = await db.query(
-      "SELECT * FROM utilisateur WHERE id_utilisateur = ?",
-      [id]
-    );
-    return rows[0] || null;
-  } */
-
   static async findAllUsers() {
     const [rows] = await db.query("SELECT * FROM utilisateur");
     return rows;

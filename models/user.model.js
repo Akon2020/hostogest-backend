@@ -32,14 +32,19 @@ export default class UserModel {
   }
 
   static async updateUser(id, { nom, prenom, email }) {
-    await db.query(
+    const [info] = await db.query(
       "UPDATE utilisateur SET nom = ?, prenom = ?, email = ? WHERE id_utilisateur = ?",
       [nom, prenom, email, id]
     );
+    return info;
   }
 
   static async deleteUser(id) {
-    await db.query("DELETE FROM utilisateur WHERE id_utilisateur = ?", [id]);
+    const [supprim] = await db.query(
+      "DELETE FROM utilisateur WHERE id_utilisateur = ?",
+      [id]
+    );
+    return supprim;
   }
 
   static async updatePassword(id, newPassword) {

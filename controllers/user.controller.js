@@ -54,7 +54,32 @@ export const updateUserInfo = async (req, res, next) => {
     const user = await UserModel.updateUser(id, { nom, prenom, email });
     if (user.affectedRows > 0) {
       res.status(200).json({
-        message: `Les informations de ${user.prenom} ont été mis à jour avec succès`,
+        message: `Les informations de ${userExist.prenom} ${userExist.nom} ont été mis à jour avec succès`,
+      });
+    } else {
+      res.status(404).json({ message: "Information non trouvée" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur" });
+    next(error);
+  }
+};
+
+export const deleteUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const userExist = await UserModel.findUserById(id);
+
+    if (!userExist) {
+      return res
+        .status(400)
+        .json({ message: "Cet utilisateur n'exite pas dans notre système" });
+    }
+    const deleteUser = await UserModel.deleteUser(id);
+
+    if (deleteUser.affectedRows > 0) {
+      res.status(200).json({
+        message: `L'utilisateur ${userExist.prenom} ${userExist.nom} supprimé avec succès`,
       });
     } else {
       res.status(404).json({ message: "Information non trouvée" });

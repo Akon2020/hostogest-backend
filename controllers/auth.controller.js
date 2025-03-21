@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { EMAIL, HOST_URL, JWT_EXPIRES_IN, JWT_SECRET } from "../config/env.js";
 import transporter from "../config/nodemailer.js";
 import { resetPasswordEmailTemplate } from "../utils/email.template.js";
+import { valideEmail } from "../middlewares/email.middleware.js";
 
 const generateToken = (user) => {
   return jwt.sign({ email: user.email }, JWT_SECRET, {
@@ -14,12 +15,26 @@ const generateToken = (user) => {
 export const register = async (req, res, next) => {
   try {
     const { nom, prenom, email, password } = req.body;
+
+    if (!email || !password || !nom || !prenom) {
+      return res
+        .status(400)
+        .json({ message: "Vous devez renseigner tout les champs!" });
+    }
+
+    if (!valideEmail(email)) {
+      return res
+        .status(400)
+        .json({ message: "Entrez une adresse mail valide" });
+    }
+
     const userExists = await UserModel.findUserByEmail(email);
     if (userExists) {
       return res
         .status(400)
         .json({ message: "Cet utilisateur a déjà un compte" });
     }
+
     const userId = await UserModel.createUser({ nom, prenom, email, password });
     const token = generateToken({ id: userId, email });
 
@@ -60,15 +75,18 @@ export const login = async (req, res, next) => {
 export const resetPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "L'email est requis" });
+    }
+
     const user = await UserModel.findUserByEmail(email);
 
     if (!user) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "Cet email n'est attaché à aucun compte! Veuillez vérifier votre email",
-        });
+      return res.status(400).json({
+        message:
+          "Cet email n'est attaché à aucun compte! Veuillez vérifier votre email",
+      });
     }
     const resetToken = generateToken(user);
     const mailOptions = {
@@ -123,7 +141,10 @@ export const updatePassword = async (req, res, next) => {
 
     await UserModel.updatePassword(user.id_utilisateur, newPassword);
 
-    res.status(200).json({ message: "Mot de passe réinitialisé avec succès! Connectez-vous maintenant" });
+    res.status(200).json({
+      message:
+        "Mot de passe réinitialisé avec succès! Connectez-vous maintenant",
+    });
   } catch (error) {
     console.error(
       "Erreur lors de la réinitialisation du mot de passe :",

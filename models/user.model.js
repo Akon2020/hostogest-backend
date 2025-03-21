@@ -15,14 +15,14 @@ export default class UserModel {
       [id]
     );
     return rows.length > 0 ? rows[0] : null;
-}
+  }
   static async findAllUsers() {
     const [rows] = await db.query("SELECT * FROM utilisateur");
     return rows;
   }
 
   static async createUser({ nom, prenom, email, password }) {
-    const salt = await bcrypt.genSalt()
+    const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
     const [result] = await db.query(
       "INSERT INTO utilisateur (nom, prenom, email, mot_de_passe) VALUES (?, ?, ?, ?)",

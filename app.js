@@ -7,6 +7,7 @@ import { PORT, URL_ORIGIN } from "./config/env.js";
 import db from "./database/db.js";
 import errorMiddleware, { errorLogs } from "./middlewares/error.middleware.js";
 import authRouter from "./routes/auth.routes.js";
+import userRouter from "./routes/user.routes.js";
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/auth", authRouter);
+app.use("/home", userRouter);
 
 app.get("/error", errorLogs);
 app.use(errorMiddleware);

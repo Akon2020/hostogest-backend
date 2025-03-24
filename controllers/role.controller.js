@@ -1,5 +1,8 @@
+import { EMAIL, HOST_URL } from "../config/env.js";
+import transporter from "../config/nodemailer.js";
 import RoleModel from "../models/role.model.js";
 import UserModel from "../models/user.model.js";
+import { roleAssignmentEmailTemplate } from "../utils/email.template.js";
 
 export const getAllRoles = async (req, res, next) => {
   try {
@@ -127,8 +130,21 @@ export const affectRoleToUser = async (req, res, next) => {
       return res.status(400).json({ message: "L'utilisateur a déjà ce rôle!" });
     }
     await RoleModel.affectRole(idUser, idRole);
+
+    const mailOptions = {
+      from: EMAIL,
+      to: userExist.email,
+      subject: `Nouveau rôle attribué : ${roleExist.nom}`,
+      html: roleAssignmentEmailTemplate(
+        `${userExist.prenom} ${userExist.nom}`,
+        roleExist.nom,
+        HOST_URL
+      ),
+    };
+
+    await transporter.sendMail(mailOptions);
     res.status(201).json({
-      message: `Le rôle ${roleExist.nom} a été assigné à l'utilisateur ${userExist.prenom} ${userExist.nom} avec succès!`,
+      message: `Le rôle ${roleExist.nom} a été assigné à l'utilisateur ${userExist.prenom} ${userExist.nom} avec succès! Un email lui a été envoyé`,
     });
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur" });

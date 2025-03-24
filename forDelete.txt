@@ -1,0 +1,46 @@
+import transporter from "../config/nodemailer.js";
+import { roleAssignmentEmailTemplate } from "../utils/email.template.js";
+
+
+export const affectRoleToUser = async (req, res, next) => {
+  try {
+    const { idUser, idRole } = req.body;
+    const userExist = await UserModel.findUserById(idUser);
+    const roleExist = await RoleModel.findRoleById(idRole);
+
+    if (!roleExist || !userExist) {
+      return res.status(400).json({ message: "Veuillez renseigner tous les champs!" });
+    }
+
+    const existingRole = await RoleModel.checkUserRole(idUser, idRole);
+    if (existingRole.length > 0) {
+      return res.status(400).json({ message: "L'utilisateur a déjà ce rôle!" });
+    }
+
+    // Affectation du rôle
+    await RoleModel.affectRole(idUser, idRole);
+
+    // Préparer l'email
+    const emailContent = roleAssignmentEmailTemplate(
+      userExist.prenom + ' ' + userExist.nom,
+      userExist.email,
+      roleExist.nom,
+      'https://tonsite.com'  // Remplace par l'URL de ton tableau de bord
+    );
+
+    // Envoi de l'email
+    await transporter.sendMail({
+      from: '"HostoGest" <ton.email@gmail.com>', // L'adresse de l'expéditeur
+      to: userExist.email, // L'email de l'utilisateur
+      subject: `Nouveau rôle attribué : ${roleExist.nom}`,
+      html: emailContent, // Le contenu HTML de l'email
+    });
+
+    res.status(201).json({
+      message: `Le rôle ${roleExist.nom} a été assigné à l'utilisateur ${userExist.prenom} ${userExist.nom} avec succès!`,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur" });
+    next(error);
+  }
+};

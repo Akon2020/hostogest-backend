@@ -8,11 +8,11 @@ import {
 
 const userRouter = Router();
 
-userRouter.get("/users", getAllUsers);
-userRouter.get("/user/:id", getSingleUser);
+userRouter.get("/", getAllUsers);
+userRouter.get("/:id", getSingleUser);
 
-userRouter.put("/user/update/:id", updateUserInfo);
+userRouter.put("/update/:id", updateUserInfo);
 
-userRouter.delete("/user/delete/:id", deleteUser);
+userRouter.delete("/delete/:id", deleteUser);
 
 export default userRouter;

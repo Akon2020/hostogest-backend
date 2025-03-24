@@ -1,0 +1,23 @@
+{
+  "/": "GET Teste que l'API passe bien ligne",
+
+  "/auth": [
+    {
+      "/login": "POST Connexion au compte",
+      "/register": "POST Créer un compte",
+      "reset-password": "POST Demander un token de réinitilisation du mot de passe",
+      "resetpassword": "POST Confirmer par le token et création d'un nouveau mot de passe"
+    }
+  ],
+
+  "/users": [
+    {
+      "/": "GET Liste totale des utilisateurs",
+      "/:id": "GET Afficher les détails d'un utilisateur spécifique",
+      "/update/:id": "PUT Modifier les informations d'un utilisateur spécifique",
+      "/delete/:id": "DELETE Supprimer les informations d'un utilisateur spécifique"
+    }
+  ],
+
+  "/error": "GET Affiche les erreurs dans l'API (seulement en mode developpement)"
+}

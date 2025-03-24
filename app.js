@@ -8,6 +8,7 @@ import db from "./database/db.js";
 import errorMiddleware, { errorLogs } from "./middlewares/error.middleware.js";
 import authRouter from "./routes/auth.routes.js";
 import userRouter from "./routes/user.routes.js";
+import roleRouter from "./routes/role.routes.js";
 
 const app = express();
 
@@ -24,7 +25,7 @@ app.use(
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
     headers: {
-      "Content-Type": ["application/x-www-form-urlencoded", "application/json"],
+      "Content-Type": ["application/json", "application/x-www-form-urlencoded"],
       "Content-Length": "0",
     },
   })
@@ -37,7 +38,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/auth", authRouter);
-app.use("/home", userRouter);
+app.use("/users", userRouter);
+app.use("/roles", roleRouter);
 
 app.get("/error", errorLogs);
 app.use(errorMiddleware);

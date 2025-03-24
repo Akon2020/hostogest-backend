@@ -35,4 +35,28 @@ export default class RoleModel {
     ]);
     return supprim;
   }
+
+  static async affectRole(idRole, idUser) {
+    const [result] = await db.query(
+      "INSERT INTO utilisateur_role (id_utilisateur, id_role) VALUES (?, ?)",
+      [idRole, idUser]
+    );
+    return result.insertId;
+  }
+
+  static async checkUserRole(idUser, idRole) {
+    const [rows] = await db.query(
+      "SELECT * FROM utilisateur_role WHERE id_utilisateur = ? AND id_role = ?",
+      [idUser, idRole]
+    );
+    return rows;
+  }
+
+  static async getUserRoles(idUser) {
+    const [roles] = await db.query(
+      "SELECT r.id_role, r.nom FROM role r INNER JOIN utilisateur_role ur ON r.id_role = ur.id_role WHERE ur.id_utilisateur = ?",
+      [idUser]
+    );
+    return roles;
+  }
 }

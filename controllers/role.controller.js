@@ -1,4 +1,5 @@
 import RoleModel from "../models/role.model.js";
+import UserModel from "../models/user.model.js";
 
 export const getAllRoles = async (req, res, next) => {
   try {
@@ -103,6 +104,55 @@ export const deleteRoleInfo = async (req, res, next) => {
     } else {
       res.status(404).json({ message: "Information non trouvée" });
     }
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur" });
+    next(error);
+  }
+};
+
+export const affectRoleToUser = async (req, res, next) => {
+  try {
+    const { idUser, idRole } = req.body;
+    const userExist = await UserModel.findUserById(idUser);
+    const roleExist = await RoleModel.findRoleById(idRole);
+
+    if (!roleExist || !userExist) {
+      return res
+        .status(400)
+        .json({ message: "Veuillez renseigner tout les champs!" });
+    }
+
+    const existingRole = await RoleModel.checkUserRole(idUser, idRole);
+    if (existingRole.length > 0) {
+      return res.status(400).json({ message: "L'utilisateur a déjà ce rôle!" });
+    }
+    await RoleModel.affectRole(idUser, idRole);
+    res.status(201).json({
+      message: `Le rôle ${roleExist.nom} a été assigné à l'utilisateur ${userExist.prenom} ${userExist.nom} avec succès!`,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur" });
+    next(error);
+  }
+};
+
+export const getUserRoles = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const userExist = await UserModel.findUserById(id);
+    if (!userExist) {
+      return res
+        .status(400)
+        .json({ message: "Cet utilisateur n'existe pas dans notre système" });
+    }
+
+    const roles = await RoleModel.getUserRoles(id);
+    res.status(200).json({
+      userRole: {
+        user: `${userExist.prenom} ${userExist.nom}`,
+        roles,
+      },
+    });
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur" });
     next(error);

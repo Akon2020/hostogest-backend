@@ -21,7 +21,6 @@ export default class PatientModel {
     );
     return rows[0] || null;
   }
-
   static async createPatient({
     nom,
     prenom,
@@ -47,34 +46,94 @@ export default class PatientModel {
     SpO,
     indicePignet,
     dateHeureAdmission,
-  }) {}
-  
-  static async updatePatient(id, {
-    nom,
-    prenom,
-    dateNaissance,
-    sexe,
-    email,
-    tel,
-    adresse,
-    categorie,
-    etatCivil,
-    profession,
-    religion,
-    motifConsultation,
-    antecedents,
-    complementAnamnese,
-    temperature,
-    frequenceRespir,
-    frequenceCardiaque,
-    tauxA,
-    poids,
-    taille,
-    indiceMasseCorpo,
-    SpO,
-    indicePignet,
-    dateHeureAdmission,
-  }) {}
+  }) {
+    const [result] = await db.query("", [
+      nom,
+      prenom,
+      dateNaissance,
+      sexe,
+      email,
+      tel,
+      adresse,
+      categorie,
+      etatCivil,
+      profession,
+      religion,
+      motifConsultation,
+      antecedents,
+      complementAnamnese,
+      temperature,
+      frequenceRespir,
+      frequenceCardiaque,
+      tauxA,
+      poids,
+      taille,
+      indiceMasseCorpo,
+      SpO,
+      indicePignet,
+      dateHeureAdmission,
+    ]);
+    return result.insertId;
+  }
+
+  static async updatePatient(
+    id,
+    {
+      nom,
+      prenom,
+      dateNaissance,
+      sexe,
+      email,
+      tel,
+      adresse,
+      categorie,
+      etatCivil,
+      profession,
+      religion,
+      motifConsultation,
+      antecedents,
+      complementAnamnese,
+      temperature,
+      frequenceRespir,
+      frequenceCardiaque,
+      tauxA,
+      poids,
+      taille,
+      indiceMasseCorpo,
+      SpO,
+      indicePignet,
+      dateHeureAdmission,
+    }
+  ) {
+    const [info] = await db.query("", [
+      nom,
+      prenom,
+      dateNaissance,
+      sexe,
+      email,
+      tel,
+      adresse,
+      categorie,
+      etatCivil,
+      profession,
+      religion,
+      motifConsultation,
+      antecedents,
+      complementAnamnese,
+      temperature,
+      frequenceRespir,
+      frequenceCardiaque,
+      tauxA,
+      poids,
+      taille,
+      indiceMasseCorpo,
+      SpO,
+      indicePignet,
+      dateHeureAdmission,
+      id,
+    ]);
+    return info;
+  }
 
   static async deletePatient(id) {
     const [supprim] = await db.query(

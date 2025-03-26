@@ -7,7 +7,7 @@ import { roleAssignmentEmailTemplate } from "../utils/email.template.js";
 export const getAllRoles = async (req, res, next) => {
   try {
     const roles = await RoleModel.findAllRoles();
-    return res.status(200).json({ nombre: roles.length, utilisateurs: roles });
+    return res.status(200).json({ nombre: roles.length, rolesInfo: roles });
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur" });
     next(error);

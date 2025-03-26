@@ -1,11 +1,11 @@
-import PatientModel from "../models/patient.model";
+import PatientModel from "../models/patient.model.js";
 
 export const getAllPatients = async (req, res, next) => {
   try {
     const patients = await PatientModel.findAllPatients();
     return res
       .status(200)
-      .json({ nombre: patients.length, utilisateurs: patients });
+      .json({ nombre: patients.length, patientsInfo: patients });
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur" });
     next(error);
@@ -28,9 +28,13 @@ export const getSinglePatient = async (req, res, next) => {
   }
 };
 
-export const addPatient = async (req, res, next) => {};
+export const addPatient = async (req, res, next) => {
+  return req, res, next;
+};
 
-export const updatePatientInfo = async (req, res, next) => {};
+export const updatePatientInfo = async (req, res, next) => {
+  return req, res, next;
+};
 
 export const deletePatientInfo = async (req, res, next) => {
   try {

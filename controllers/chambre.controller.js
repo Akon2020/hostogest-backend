@@ -5,7 +5,7 @@ export const getAllChambres = async (req, res, next) => {
     const chambres = await ChambreModel.findAllChambres();
     return res
       .status(200)
-      .json({ nombre: chambres.length, utilisateurs: chambres });
+      .json({ nombre: chambres.length, chambresInfo: chambres });
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur" });
     next(error);

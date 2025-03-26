@@ -9,6 +9,7 @@ import errorMiddleware, { errorLogs } from "./middlewares/error.middleware.js";
 import authRouter from "./routes/auth.routes.js";
 import userRouter from "./routes/user.routes.js";
 import roleRouter from "./routes/role.routes.js";
+import patientRouter from "./routes/patient.routes.js";
 
 const app = express();
 
@@ -40,6 +41,7 @@ app.get("/", (req, res) => {
 app.use("/auth", authRouter);
 app.use("/users", userRouter);
 app.use("/roles", roleRouter);
+app.use("/patients", patientRouter);
 
 app.get("/error", errorLogs);
 app.use(errorMiddleware);

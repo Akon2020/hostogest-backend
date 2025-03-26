@@ -10,6 +10,7 @@ import authRouter from "./routes/auth.routes.js";
 import userRouter from "./routes/user.routes.js";
 import roleRouter from "./routes/role.routes.js";
 import patientRouter from "./routes/patient.routes.js";
+import chambreRouter from "./routes/chambre.routes.js";
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.use("/auth", authRouter);
 app.use("/users", userRouter);
 app.use("/roles", roleRouter);
 app.use("/patients", patientRouter);
+app.use("/chambres", chambreRouter);
 
 app.get("/error", errorLogs);
 app.use(errorMiddleware);

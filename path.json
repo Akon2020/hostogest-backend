@@ -19,5 +19,48 @@
     }
   ],
 
+  "/roles": [
+    {
+      "/": "GET Liste totale des rôles du système",
+      "/:id": "GET Afficher les détails d'un rôle spécifique",
+      "/user/:id": "GET Afficher les rôles d'un utilisateur spécifique",
+      "/add": "POST Ajouter un rôle au système",
+      "/update/:id": "PUT Modifier les informations d'un rôle spécifique",
+      "/delete/:id": "DELETE Supprimer les informations d'un rôle spécifique"
+    }
+  ],
+
+  "/patients": [
+    {
+      "/": "GET Liste totale des patients",
+      "/:id": "GET Afficher les détails d'un patient spécifique",
+      "/add": "POST Ajouter un patient au système",
+      "/update/:id": "PUT Modifier les informations d'un patient spécifique",
+      "/delete/:id": "DELETE Supprimer les informations d'un patient spécifique"
+    }
+  ],
+
+  "/chambres": [
+    {
+      "/": "GET Liste totale des chambres",
+      "/:id": "GET Afficher les détails d'une chambre spécifique",
+      "/type/:id": "GET Afficher le type d'une chambre spécifique",
+      "/add": "POST Ajouter une chambre dans le système",
+      "/update/:id": "PUT Modifier les informations d'une chambre spécifique",
+      "/delete/:id": "DELETE Supprimer les informations d'une chambre spécifique"
+    }
+  ],
+
+  "/lits": [
+    {
+      "/": "GET Liste totale des lits",
+      "/:id": "GET Afficher les détails d'un lit spécifique",
+      "/status/:id": "GET Afficher le statut d'un lit spécifique",
+      "/add": "POST Ajouter un lit dans le système",
+      "/update/:id": "PUT Modifier les informations d'un lit spécifique",
+      "/delete/:id": "DELETE Supprimer les informations d'un lit spécifique"
+    }
+  ],
+
   "/error": "GET Affiche les erreurs dans l'API (seulement en mode developpement)"
 }

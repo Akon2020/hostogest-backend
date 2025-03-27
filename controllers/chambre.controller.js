@@ -31,7 +31,7 @@ export const getSingleChambre = async (req, res, next) => {
 
 export const getChambreByType = async (req, res, next) => {
   try {
-    const { type } = req.query;
+    const { type } = req.body;
     const chambre = await ChambreModel.findChambreByType(type);
     if (!chambre) {
       return res.status(400).json({

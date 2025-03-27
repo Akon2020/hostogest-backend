@@ -11,6 +11,7 @@ import userRouter from "./routes/user.routes.js";
 import roleRouter from "./routes/role.routes.js";
 import patientRouter from "./routes/patient.routes.js";
 import chambreRouter from "./routes/chambre.routes.js";
+import litRouter from "./routes/lit.routes.js";
 
 const app = express();
 
@@ -44,6 +45,7 @@ app.use("/users", userRouter);
 app.use("/roles", roleRouter);
 app.use("/patients", patientRouter);
 app.use("/chambres", chambreRouter);
+app.use("/lits", litRouter);
 
 app.get("/error", errorLogs);
 app.use(errorMiddleware);

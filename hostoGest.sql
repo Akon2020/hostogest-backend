@@ -70,8 +70,8 @@ CREATE TABLE HOSPITALISATION (
     id_hospitalisation INT AUTO_INCREMENT PRIMARY KEY,
     id_patient INT NOT NULL,
     id_lit INT NOT NULL,
-    date_entree DATE NOT NULL,
-    date_sortie DATE DEFAULT NULL,
+    date_entree DATETIME NOT NULL,
+    date_sortie DATETIME DEFAULT NULL,
     FOREIGN KEY (id_patient) REFERENCES PATIENT(id_patient) ON DELETE CASCADE,
     FOREIGN KEY (id_lit) REFERENCES LIT(id_lit) ON DELETE CASCADE
 ) ENGINE=InnoDB;
@@ -80,8 +80,7 @@ CREATE TABLE VISITE_MEDECIN (
     id_visite INT AUTO_INCREMENT PRIMARY KEY,
     id_hospitalisation INT NOT NULL,
     id_utilisateur INT NOT NULL,
-    date_visite DATE NOT NULL,
-    heure_visite TIME NOT NULL,
+    dateHeure_visite DATETIME NOT NULL,
     observations TEXT,
     FOREIGN KEY (id_hospitalisation) REFERENCES HOSPITALISATION(id_hospitalisation) ON DELETE CASCADE,
     FOREIGN KEY (id_utilisateur) REFERENCES UTILISATEUR(id_utilisateur) ON DELETE CASCADE
@@ -91,7 +90,7 @@ CREATE TABLE PRESCRIPTION (
     id_prescription INT AUTO_INCREMENT PRIMARY KEY,
     id_hospitalisation INT NOT NULL,
     id_utilisateur INT NOT NULL,
-    date_prescription DATE NOT NULL,
+    date_prescription DATETIME NOT NULL,
     FOREIGN KEY (id_hospitalisation) REFERENCES HOSPITALISATION(id_hospitalisation) ON DELETE CASCADE,
     FOREIGN KEY (id_utilisateur) REFERENCES UTILISATEUR(id_utilisateur) ON DELETE CASCADE
 ) ENGINE=InnoDB;

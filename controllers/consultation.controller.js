@@ -155,19 +155,62 @@ export const getPatientConsultation = async (req, res, next) => {
   try {
     const { id } = req.params;
     const existingPatient = await Patient.findByPk(id);
+
     if (!existingPatient) {
       return res.status(404).json({
         message: "Ce patient n'est pas enregistré dans notre système.",
       });
     }
+
     const consultations = await Consultation.findAll({
-      where: { idPatient: existingPatient.id },
+      where: { idPatient: existingPatient.idPatient },
+      include: [
+        {
+          model: User,
+          as: "User",
+          attributes: ["idUser", "firstName", "lastName", "email"],
+        },
+        {
+          model: Mensuration,
+          as: "Mensuration",
+          attributes: [
+            "idMensuration",
+            "temperature",
+            "heartRate",
+            "bloodPressure",
+            "respiratoryRate",
+            "weight",
+            "size",
+            "bodyMassIndex",
+            "bloodOxygenSaturation",
+            "pignetIndex",
+            "passedOn",
+          ],
+        },
+        {
+          model: Prescription,
+          as: "Prescription",
+          attributes: ["idPrescription", "description"],
+        },
+        {
+          model: Antecedent,
+          as: "Antecedent",
+          attributes: ["idAntecedent", "description"],
+        },
+        {
+          model: Hospitalization,
+          as: "Hospitalization",
+          attributes: ["idHospitalization", "admissionDate", "description"],
+        },
+      ],
     });
+
     if (!consultations || consultations.length === 0) {
       return res.status(404).json({
-        message: `Aucune consultation trouvée pour le patient avec l'ID ${id}.`,
+        message: `Aucune consultation trouvée pour le patient ${existingPatient.firstName} ${existingPatient.lastName}.`,
       });
     }
+
     return res
       .status(200)
       .json({ nombre: consultations.length, consultationInfo: consultations });
@@ -184,19 +227,70 @@ export const getUserConsultation = async (req, res, next) => {
   try {
     const { id } = req.params;
     const existingUser = await User.findByPk(id);
+
     if (!existingUser) {
       return res.status(404).json({
         message: "Cet utilisateur n'est pas enregistré dans notre système.",
       });
     }
+
     const consultations = await Consultation.findAll({
-      where: { idUser: existingUser.id },
+      where: { idUser: existingUser.idUser },
+      include: [
+        {
+          model: Patient,
+          as: "Patient",
+          attributes: [
+            "idPatient",
+            "firstName",
+            "lastName",
+            "birthDate",
+            "gender",
+            "phone",
+            "email",
+          ],
+        },
+        {
+          model: Mensuration,
+          as: "Mensuration",
+          attributes: [
+            "idMensuration",
+            "temperature",
+            "heartRate",
+            "bloodPressure",
+            "respiratoryRate",
+            "weight",
+            "size",
+            "bodyMassIndex",
+            "bloodOxygenSaturation",
+            "pignetIndex",
+            "passedOn",
+          ],
+        },
+        {
+          model: Prescription,
+          as: "Prescription",
+          attributes: ["idPrescription", "description"],
+        },
+        {
+          model: Antecedent,
+          as: "Antecedent",
+          attributes: ["idAntecedent", "description"],
+        },
+        {
+          model: Hospitalization,
+          as: "Hospitalization",
+          attributes: ["idHospitalization", "admissionDate", "description"],
+        },
+      ],
     });
+
     if (!consultations || consultations.length === 0) {
       return res.status(404).json({
-        message: `Aucune consultation trouvée effectuée par l'utilisateur avec l'ID ${id}.`,
+        message: `Aucune consultation trouvée effectuée par l'utilisateur ${existingUser.firstName} ${existingUser.lastName}.`,
       });
     }
+
     return res
       .status(200)
       .json({ nombre: consultations.length, consultationInfo: consultations });

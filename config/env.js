@@ -14,5 +14,7 @@ export const {
   JWT_EXPIRES_IN,
   EMAIL,
   EMAIL_PASSWORD,
+  DEFAULT_PASSWD,
   HOST_URL,
+  API_URL,
 } = process.env;

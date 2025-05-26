@@ -7,8 +7,11 @@ import {
   getSingleMedicament,
   updateMedicamentInfo,
 } from "../controllers/medicament.controller.js";
+import { authenticationJWT } from "../middlewares/auth.middleware.js";
 
 const medicamentRouter = Router();
+
+medicamentRouter.use(authenticationJWT);
 
 medicamentRouter.get("/", getAllMedicaments);
 medicamentRouter.get("/:id", getSingleMedicament);

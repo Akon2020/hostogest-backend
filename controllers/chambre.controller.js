@@ -1,11 +1,9 @@
-import ChambreModel from "../models/chambre.model.js";
+import { Room } from "../models/index.model.js";
 
 export const getAllChambres = async (req, res, next) => {
   try {
-    const chambres = await ChambreModel.findAllChambres();
-    return res
-      .status(200)
-      .json({ nombre: chambres.length, chambresInfo: chambres });
+    const chambres = await Room.findAll();
+    return res.status(200).json({ nombre: chambres.length, rooms: chambres });
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur" });
     next(error);
@@ -15,14 +13,14 @@ export const getAllChambres = async (req, res, next) => {
 export const getSingleChambre = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const chambre = await ChambreModel.findChambreById(id);
+    const chambre = await Room.findByPk(id);
 
     if (!chambre) {
       return res
         .status(400)
         .json({ message: "Cette chambre n'existe pas dans notre système" });
     }
-    return res.status(200).json({ chambreInfo: chambre });
+    return res.status(200).json({ room: chambre });
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur" });
     next(error);
@@ -31,14 +29,16 @@ export const getSingleChambre = async (req, res, next) => {
 
 export const getChambreByType = async (req, res, next) => {
   try {
-    const { type } = req.body;
-    const chambre = await ChambreModel.findChambreByType(type);
-    if (!chambre) {
-      return res.status(400).json({
-        message: "Ce type de chambre n'existe pas dans notre système",
+    const { type } = req.params;
+    const chambre = await Room.findAll({ where: { type } });
+
+    if (chambre.length === 0) {
+      return res.status(404).json({
+        message: `Aucune chambre de type '${type}' n'existe dans notre système.`,
       });
     }
-    return res.status(200).json({ chambreInfo: chambre });
+
+    return res.status(200).json({ nombre: chambre.length, room: chambre });
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur" });
     next(error);
@@ -47,26 +47,26 @@ export const getChambreByType = async (req, res, next) => {
 
 export const addChambre = async (req, res, next) => {
   try {
-    const { numero, type, tarif } = req.body;
+    const { roomNumber, type, price } = req.body;
 
-    if (!numero || !type || !tarif) {
+    if (!roomNumber || !type || !price) {
       return res
         .status(400)
         .json({ message: "Vous devez renseigner tout les champs!" });
     }
-    const chambreExist = await ChambreModel.findChambreByNum(numero);
+    const chambreExist = await Room.findOne({ where: { roomNumber } });
     if (chambreExist) {
       return res.status(400).json({
         message: "Cette chambre a déjà été enregistrer dans notre système",
       });
     }
-    const newChambre = await ChambreModel.createChambre({
-      numero,
+    const newChambre = await Room.create({
+      roomNumber,
       type,
-      tarif,
+      price,
     });
     res.status(201).json({
-      message: `La chambre ${numero} a été créé avec succès`,
+      message: `La chambre ${roomNumber} a été créé avec succès`,
       data: newChambre,
     });
   } catch (error) {
@@ -78,35 +78,27 @@ export const addChambre = async (req, res, next) => {
 export const updateChambre = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { numero, type, tarif, statut } = req.body;
+    const champsModifiables = ["roomNumber", "type", "price"];
+    const donneesAMettreAJour = {};
+    champsModifiables.forEach((champ) => {
+      if (req.body[champ] !== undefined) {
+        donneesAMettreAJour[champ] = req.body[champ];
+      }
+    });
 
-    if (!numero || !type || !tarif) {
-      return res
-        .status(400)
-        .json({ message: "Vous devez renseigner tout les champs!" });
-    }
-
-    const chambreExist = await ChambreModel.findChambreById(id);
+    const chambreExist = await Room.findByPk(id);
     if (!chambreExist) {
       return res.status(400).json({
         message: "Cette chambre n'existe pas dans notre système",
       });
     }
 
-    const chambre = await ChambreModel.updateChambre(id, {
-      numero,
-      type,
-      tarif,
-      statut,
-    });
+    const chambre = await chambreExist.update(donneesAMettreAJour);
 
-    if (chambre.affectedRows > 0) {
-      res.status(200).json({
-        message: `Les informations de la chambre ${chambreExist.numero} ont été mis à jour avec succès`,
-      });
-    } else {
-      res.status(404).json({ message: "Information non trouvée" });
-    }
+    return res.status(200).json({
+      message: `Les informations de la chambre ${chambreExist.roomNumber} ont été mis à jour avec succès`,
+      data: chambre,
+    });
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur" });
     next(error);
@@ -116,7 +108,7 @@ export const updateChambre = async (req, res, next) => {
 export const deleteChambre = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const chambreExist = await ChambreModel.findChambreById(id);
+    const chambreExist = await Room.findByPk(id);
 
     if (!chambreExist) {
       return res
@@ -124,14 +116,10 @@ export const deleteChambre = async (req, res, next) => {
         .json({ message: "Cette chambre n'existe pas dans notre système" });
     }
 
-    const deleteChambre = await ChambreModel.deleteChambre(id)
-    if (deleteChambre.affectedRows > 0) {
-        res.status(200).json({
-          message: `La chambre ${chambreExist.numero} a été supprimé avec succès`,
-        });
-      } else {
-        res.status(404).json({ message: "Information non trouvée" });
-      }
+    await chambreExist.destroy();
+    res.status(200).json({
+      message: `La chambre ${chambreExist.roomNumber} a été supprimé avec succès`,
+    });
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur" });
     next(error);

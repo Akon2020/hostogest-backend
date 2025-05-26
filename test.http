@@ -1,0 +1,228 @@
+POST http://localhost:5500/api/auth/login/ HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+
+{
+    "email": "akonkwaushindi@gmail.com",
+    "password": "admin@123Y"
+}
+###
+
+GET http://localhost:5500/api/auth/status HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFrb25rd2F1c2hpbmRpQGdtYWlsLmNvbSIsImlhdCI6MTc0ODIzMzUzOCwiZXhwIjoxNzQ4MzE5OTM4fQ.phgbP2m392t8ujTrdJ5GhiVXRr26FnaC6rFKNmlQW8c
+
+###
+
+GET http://localhost:5500/api/dashboard/stats HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFrb25rd2F1c2hpbmRpQGdtYWlsLmNvbSIsImlhdCI6MTc0ODIzMzUzOCwiZXhwIjoxNzQ4MzE5OTM4fQ.phgbP2m392t8ujTrdJ5GhiVXRr26FnaC6rFKNmlQW8c
+###
+
+GET http://localhost:5500/api/dashboard/patient/1 HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFrb25rd2F1c2hpbmRpQGdtYWlsLmNvbSIsImlhdCI6MTc0ODIzMzUzOCwiZXhwIjoxNzQ4MzE5OTM4fQ.phgbP2m392t8ujTrdJ5GhiVXRr26FnaC6rFKNmlQW8c
+
+###
+
+POST  http://localhost:5500/patients/add HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFrb25rd2F1c2hpbmRpQGdtYWlsLmNvbSIsImlhdCI6MTc0ODIzMzUzOCwiZXhwIjoxNzQ4MzE5OTM4fQ.phgbP2m392t8ujTrdJ5GhiVXRr26FnaC6rFKNmlQW8c
+
+{
+  "firstName": "Janvier",
+  "lastName": "Souffrance",
+  "birthDate": "1993-01-12",
+  "gender": "F",
+  "address": "123 Rue de la Maison",
+  "phone": "0987654321",
+  "email": "janvier.souffrance@gmail.com"
+}
+
+###
+
+GET http://localhost:5500/api/beds HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFrb25rd2F1c2hpbmRpQGdtYWlsLmNvbSIsImlhdCI6MTc0ODIzMzUzOCwiZXhwIjoxNzQ4MzE5OTM4fQ.phgbP2m392t8ujTrdJ5GhiVXRr26FnaC6rFKNmlQW8c
+
+###
+
+GET http://localhost:5500/api/users/ HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFrb25rd2F1c2hpbmRpQGdtYWlsLmNvbSIsImlhdCI6MTc0ODIzMzUzOCwiZXhwIjoxNzQ4MzE5OTM4fQ.phgbP2m392t8ujTrdJ5GhiVXRr26FnaC6rFKNmlQW8c
+
+###
+
+GET http://localhost:5500/api/rooms/ HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFrb25rd2F1c2hpbmRpQGdtYWlsLmNvbSIsImlhdCI6MTc0ODIzMzUzOCwiZXhwIjoxNzQ4MzE5OTM4fQ.phgbP2m392t8ujTrdJ5GhiVXRr26FnaC6rFKNmlQW8c
+
+###
+
+GET http://localhost:5500/api/users/user/1/role HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFrb25rd2F1c2hpbmRpQGdtYWlsLmNvbSIsImlhdCI6MTc0ODIzMzUzOCwiZXhwIjoxNzQ4MzE5OTM4fQ.phgbP2m392t8ujTrdJ5GhiVXRr26FnaC6rFKNmlQW8c
+
+###
+
+
+GET http://localhost:5500/api/users/user/1/feature HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFrb25rd2F1c2hpbmRpQGdtYWlsLmNvbSIsImlhdCI6MTc0ODIzMzUzOCwiZXhwIjoxNzQ4MzE5OTM4fQ.phgbP2m392t8ujTrdJ5GhiVXRr26FnaC6rFKNmlQW8c
+
+###
+
+GET http://localhost:5500/api/users/user/1/permission HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFrb25rd2F1c2hpbmRpQGdtYWlsLmNvbSIsImlhdCI6MTc0ODIzMzUzOCwiZXhwIjoxNzQ4MzE5OTM4fQ.phgbP2m392t8ujTrdJ5GhiVXRr26FnaC6rFKNmlQW8c
+
+###
+
+GET http://localhost:5500/vehicules/2/ HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFrb25rd2F1c2hpbmRpQGdtYWlsLmNvbSIsImlhdCI6MTc0ODIzMzUzOCwiZXhwIjoxNzQ4MzE5OTM4fQ.phgbP2m392t8ujTrdJ5GhiVXRr26FnaC6rFKNmlQW8c
+
+###
+
+POST http://localhost:5500/vehicules/ HTTP/1.1
+Content-Type: multipart/form-data
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFrb25rd2F1c2hpbmRpQGdtYWlsLmNvbSIsImlhdCI6MTc0ODIzMzUzOCwiZXhwIjoxNzQ4MzE5OTM4fQ.phgbP2m392t8ujTrdJ5GhiVXRr26FnaC6rFKNmlQW8c
+
+{
+    "marque": "Toyota",
+    "modele": "Corolla",
+    "annee": "2021",
+    "cylindres": "4",
+    "pilotage": "Automatique",
+    "transmission": "2FWD",
+    "couleur": "Blanc",
+    "places": "5",
+    "portes": "4",
+    "carburant": "Essence",
+    "kilometrage": "0",
+    "prix": "2000",
+    "equipements": {["Climatisation", "Radio", "Bluetooth", "USB", "Camera de recul"]},
+    "historique_propritaires": "1",
+    "historique_accidents": "0",
+    "historique_reparations": "0",
+    "localisation": "Montreal",
+    "images": {["C://Users//Destin Biringanine//Downloads//image_1.png", "C://Users//Destin Biringanine//Downloads//rav4_2.png", "C://Users//Destin Biringanine//Downloads//image_3.png"]}
+}
+
+###
+
+POST http://localhost:5500/vehicules/ HTTP/1.1
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFrb25rd2F1c2hpbmRpQGdtYWlsLmNvbSIsImlhdCI6MTc0ODIzMzUzOCwiZXhwIjoxNzQ4MzE5OTM4fQ.phgbP2m392t8ujTrdJ5GhiVXRr26FnaC6rFKNmlQW8c
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="marque"
+
+Toyota
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="modele"
+
+LandCruiser
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="annee"
+
+2006
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="cylindres"
+
+4
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="pilotage"
+
+Manuel
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="transmission"
+
+2WD
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="couleur"
+
+Blanc
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="places"
+
+5
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="portes"
+
+4
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="carburant"
+
+Essence
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="kilometrage"
+
+0
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="prix"
+
+5000
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="equipements"
+
+["Climatisation", "Radio", "Bluetooth", "USB", "Camera de recul"]
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="historique_proprietaires"
+
+1
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="historique_accidents"
+
+0
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="historique_reparations"
+
+Aucune
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="localisation"
+
+Bukavu
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="images"; filename="rav4_2.png"
+Content-Type: image/png
+
+<E://eCom/eCom/assets/images/vehicules/rav4_2.png>
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="images"; filename="rav4_2.png"
+Content-Type: image/png
+
+<E://eCom/eCom/assets/images/vehicules/rav4_2.png>
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="images"; filename="rav4_2.png"
+Content-Type: image/png
+
+<E://eCom/eCom/assets/images/vehicules/rav4_2.png>
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+
+GET http://localhost:5500/vehicules/1/ HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQxODE5MjgwLCJpYXQiOjE3NDE4MTg5ODAsImp0aSI6IjM0YjM5MTc3YzYwNDQwNjk4N2U5MWY5ZDg4NDgxNDlhIiwidXNlcl9pZCI6MX0.Yek1xTaMAaYm-am7mOgOVpwYZM2DdjrSThA_1Lpf__M
+
+
+
+DELETE http://localhost:5500/vehicules/1/ HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQxODE5MjgwLCJpYXQiOjE3NDE4MTg5ODAsImp0aSI6IjM0YjM5MTc3YzYwNDQwNjk4N2U5MWY5ZDg4NDgxNDlhIiwidXNlcl9pZCI6MX0.Yek1xTaMAaYm-am7mOgOVpwYZM2DdjrSThA_1Lpf__M

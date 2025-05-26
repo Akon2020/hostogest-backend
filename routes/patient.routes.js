@@ -6,15 +6,17 @@ import {
   getSinglePatient,
   updatePatientInfo,
 } from "../controllers/patient.controller.js";
+import { authenticationJWT } from "../middlewares/auth.middleware.js";
 
 const patientRouter = Router();
+patientRouter.use(authenticationJWT);
 
-patientRouter.get("/", getAllPatients);
+patientRouter.get("/", authenticationJWT, getAllPatients);
 patientRouter.get("/:id", getSinglePatient);
 
-patientRouter.post("/add", addPatient);
+patientRouter.post("/add", authenticationJWT, addPatient);
 
-patientRouter.put("/update/:id", updatePatientInfo);
+patientRouter.patch("/update/:id", updatePatientInfo);
 
 patientRouter.delete("/delete/:id", deletePatientInfo);
 

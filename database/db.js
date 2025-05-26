@@ -1,4 +1,4 @@
-import mysql from 'mysql2/promise';
+import { Sequelize } from "sequelize";
 import { DB_HOST, DB_NAME, DB_PASS, DB_USER, NODE_ENV } from "../config/env.js";
 
 if (!DB_HOST) {
@@ -7,21 +7,21 @@ if (!DB_HOST) {
   );
 }
 
-const db = mysql.createPool({
+const db = new Sequelize(DB_NAME, DB_USER, DB_PASS, {
   host: DB_HOST,
-  user: DB_USER,
-  password: DB_PASS,
-  database: DB_NAME,
+  dialect: "mysql",
+  logging: NODE_ENV === "development" ? console.log : false,
 });
 
-db.getConnection()
-  .then(connection => {
-    console.log(`Base de données connectée avec succès en mode ${NODE_ENV}`);
-    connection.release();
-  })
-  .catch(err => {
-    console.log(`Erreur de connexion à la base de données: ${err.message}`);
-  });
-
+(async () => {
+  try {
+    await db.authenticate();
+    console.log(
+      `Base de données ${DB_NAME} connectée avec succès en mode ${NODE_ENV}`
+    );
+  } catch (err) {
+    console.error("Erreur de connexion à la base de données :", err.message);
+  }
+})();
 
 export default db;

@@ -1,23 +1,32 @@
 import { Router } from "express";
 import {
-  addLit,
-  deleteLitInfo,
+  assignBedToRoom,
+  createBed,
+  deleteBed,
   getAllLits,
+  getLitByNumber,
   getLitByStatus,
   getSingleLit,
-  updateLitInfo,
+  unassignBedFromRoom,
+  updateBed,
 } from "../controllers/lit.controller.js";
+import { authenticationJWT } from "../middlewares/auth.middleware.js";
 
 const litRouter = Router();
 
-litRouter.get("/", getAllLits);
+litRouter.use(authenticationJWT);
+
+litRouter.get("/", authenticationJWT, getAllLits);
 litRouter.get("/:id", getSingleLit);
-litRouter.get("/status/:id", getLitByStatus);
+litRouter.get("/status/:status", getLitByStatus);
+litRouter.get("/number/:bedNumber", getLitByNumber);
 
-litRouter.post("/add", addLit);
+litRouter.post("/add", createBed);
 
-litRouter.put("/update/:id", updateLitInfo);
+litRouter.patch("/update/:id", updateBed);
+litRouter.patch("/bed/:idBed/assignroom", assignBedToRoom);
+litRouter.patch("/bed/:idBed/unassignroom", unassignBedFromRoom);
 
-litRouter.delete("/delete/:id", deleteLitInfo);
+litRouter.delete("/delete/:idBed", deleteBed);
 
 export default litRouter;

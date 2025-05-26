@@ -1,57 +1,40 @@
+import { DataTypes } from "sequelize";
 import db from "../database/db.js";
-import bcrypt from "bcryptjs";
 
-export default class UserModel {
-  static async findUserByEmail(email) {
-    const [rows] = await db.query("SELECT * FROM utilisateur WHERE email = ?", [
-      email,
-    ]);
-    return rows[0] || null;
+const User = db.define(
+  "User",
+  {
+    idUser: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    firstName: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+    },
+    lastName: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING(150),
+      allowNull: false,
+      unique: true,
+    },
+    password: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+  },
+  {
+    tableName: "user",
+    timestamps: false,
   }
+);
 
-  static async findUserById(id) {
-    const [rows] = await db.query(
-      "SELECT * FROM utilisateur WHERE id_utilisateur = ?",
-      [id]
-    );
-    return rows.length > 0 ? rows[0] : null;
-  }
-  static async findAllUsers() {
-    const [rows] = await db.query("SELECT * FROM utilisateur");
-    return rows;
-  }
-
-  static async createUser({ nom, prenom, email, password }) {
-    const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash(password, salt);
-    const [result] = await db.query(
-      "INSERT INTO utilisateur (nom, prenom, email, mot_de_passe) VALUES (?, ?, ?, ?)",
-      [nom, prenom, email, hashedPassword]
-    );
-    return result.insertId;
-  }
-
-  static async updateUser(id, { nom, prenom, email }) {
-    const [info] = await db.query(
-      "UPDATE utilisateur SET nom = ?, prenom = ?, email = ? WHERE id_utilisateur = ?",
-      [nom, prenom, email, id]
-    );
-    return info;
-  }
-
-  static async deleteUser(id) {
-    const [supprim] = await db.query(
-      "DELETE FROM utilisateur WHERE id_utilisateur = ?",
-      [id]
-    );
-    return supprim;
-  }
-
-  static async updatePassword(id, newPassword) {
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await db.query(
-      "UPDATE utilisateur SET mot_de_passe = ? WHERE id_utilisateur = ?",
-      [hashedPassword, id]
-    );
-  }
-}
+export default User;

@@ -62,6 +62,17 @@ const errorMiddleware = (err, req, res, next) => {
       return res.status(403).json({ message: "Token invalide" });
     case "TokenExpiredError":
       return res.status(403).json({ message: "Token expiré" });
+    case "SequelizeValidationError":
+      return res
+        .status(400)
+        .json({
+          message: err.message,
+          errors: err.errors.map((e) => e.message),
+        });
+    case "SequelizeUniqueConstraintError":
+      return res
+        .status(409)
+        .json({ message: "Ressource déjà existante ou valeur dupliquée" });
     default:
       return res.status(500).json({
         message: "Internal Server Error",

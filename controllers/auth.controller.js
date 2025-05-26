@@ -1,22 +1,24 @@
-import UserModel from "../models/user.model.js";
+import { User } from "../models/index.model.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import { EMAIL, HOST_URL, JWT_EXPIRES_IN, JWT_SECRET } from "../config/env.js";
+import { DEFAULT_PASSWD, EMAIL, HOST_URL, JWT_SECRET } from "../config/env.js";
 import transporter from "../config/nodemailer.js";
-import { resetPasswordEmailTemplate } from "../utils/email.template.js";
+import {
+  resetPasswordEmailTemplate,
+  welcomeEmailTemplate,
+} from "../utils/email.template.js";
 import { valideEmail } from "../middlewares/email.middleware.js";
-
-const generateToken = (user) => {
-  return jwt.sign({ email: user.email }, JWT_SECRET, {
-    expiresIn: JWT_EXPIRES_IN,
-  });
-};
+import {
+  generateToken,
+  getUserWithoutPassword,
+  strongPasswd,
+} from "../utils/user.utils.js";
 
 export const register = async (req, res, next) => {
   try {
-    const { nom, prenom, email, password } = req.body;
+    const { firstName, lastName, email, password } = req.body;
 
-    if (!email || !password || !nom || !prenom) {
+    if (!email || !password || !firstName || !lastName) {
       return res
         .status(400)
         .json({ message: "Vous devez renseigner tout les champs!" });
@@ -24,24 +26,49 @@ export const register = async (req, res, next) => {
 
     if (!valideEmail(email)) {
       return res
-        .status(400)
+        .status(401)
         .json({ message: "Entrez une adresse mail valide" });
     }
 
-    const userExists = await UserModel.findUserByEmail(email);
+    if (!strongPasswd(password)) {
+      return res.status(401).json({
+        message:
+          "Le mot de passe doit être de 6 caractères au mininum et doit contenir au moins:\n- 1 lettre\n-1 chiffre\n- 1 symbole",
+      });
+    }
+
+    const userExists = await User.findOne({ where: { email } });
     if (userExists) {
       return res
         .status(400)
         .json({ message: "Cet utilisateur a déjà un compte" });
     }
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(password, salt);
 
-    const userId = await UserModel.createUser({ nom, prenom, email, password });
-    const token = generateToken({ id: userId, email });
+    const newUser = await User.create({
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
+    });
+    const token = generateToken({ id: newUser, email });
+
+    const mailOptions = {
+      from: EMAIL,
+      to: email,
+      subject: "Bienvenue sur HostoGest",
+      html: welcomeEmailTemplate(firstName, email, HOST_URL),
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    const userWithoutPassword = getUserWithoutPassword(newUser);
 
     res.cookie("token", token, { httpOnly: true, secure: true });
     res.status(201).json({
       message: "Utilisateur créé avec succès",
-      data: { token, user: userId },
+      data: { token, user: userWithoutPassword },
     });
   } catch (error) {
     console.error("Erreur lors de l'inscription :", error);
@@ -53,17 +80,33 @@ export const register = async (req, res, next) => {
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    const user = await UserModel.findUserByEmail(email);
-    if (!user || !(await bcrypt.compare(password, user.mot_de_passe))) {
+    const user = await User.findOne({ where: { email } });
+    if (!user || !(await bcrypt.compare(password, user.password))) {
       return res
-        .status(409)
+        .status(401)
         .json({ message: "Email ou mot de passe incorrect" });
     }
+
+    const isDefaultPassword = await bcrypt.compare(
+      DEFAULT_PASSWD,
+      user.password
+    );
+
+    if (isDefaultPassword) {
+      return res.status(403).json({
+        message:
+          "Vous utilisez le mot de passe par défaut. Veuillez le modifier pour continuer.",
+        requiresPasswordChange: true,
+      });
+    }
     const loginToken = generateToken(user);
-    res.cookie("token", loginToken);
-    res.status(201).json({
-      message: `Bienvenu ${user.prenom} 👋`,
-      data: { token: loginToken, userInfo: user },
+    res.cookie("token", loginToken, { httpOnly: true, secure: true });
+
+    const userWithoutPassword = getUserWithoutPassword(user);
+
+    res.status(200).json({
+      message: `Bienvenu ${userWithoutPassword.firstName} 👋`,
+      data: { token: loginToken, userInfo: userWithoutPassword },
     });
   } catch (error) {
     console.error("Erreur lors de la connexion :", error);
@@ -80,7 +123,7 @@ export const resetPassword = async (req, res, next) => {
       return res.status(400).json({ message: "L'email est requis" });
     }
 
-    const user = await UserModel.findUserByEmail(email);
+    const user = await User.findOne({ where: { email } });
 
     if (!user) {
       return res.status(400).json({
@@ -90,11 +133,11 @@ export const resetPassword = async (req, res, next) => {
     }
     const resetToken = generateToken(user);
     const mailOptions = {
-      from: EMAIL,
+      from: `"HostoGest" <${EMAIL}>`,
       to: email,
       subject: "Réinitialisation du mot de passe",
       html: resetPasswordEmailTemplate(
-        user.prenom,
+        user.firstName,
         email,
         HOST_URL,
         resetToken
@@ -102,7 +145,7 @@ export const resetPassword = async (req, res, next) => {
     };
 
     await transporter.sendMail(mailOptions);
-    res.status(201).json({
+    res.status(200).json({
       message:
         "Un email de réinitialisation vous a été envoyé! Consultez votre boîte mail",
       dev: {
@@ -134,12 +177,18 @@ export const updatePassword = async (req, res, next) => {
       return res.status(400).json({ message: "Token invalide ou expiré" });
     }
 
-    const user = await UserModel.findUserByEmail(decoded.email);
+    const user = await User.findOne({ where: { email: decoded.email } });
     if (!user) {
       return res.status(404).json({ message: "Utilisateur non trouvé" });
     }
 
-    await UserModel.updatePassword(user.id_utilisateur, newPassword);
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    await User.update(
+      { password: hashedPassword },
+      { where: { idUser: user.idUser } }
+    );
 
     res.status(200).json({
       message:
@@ -154,5 +203,26 @@ export const updatePassword = async (req, res, next) => {
       .status(500)
       .json({ message: "Erreur lors de la réinitialisation du mot de passe" });
     next(error);
+  }
+};
+
+export const logout = (req, res) => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Déconnexion réussie",
+    });
+  } catch (error) {
+    console.error("Erreur lors de la déconnexion:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Erreur lors de la déconnexion",
+    });
   }
 };
